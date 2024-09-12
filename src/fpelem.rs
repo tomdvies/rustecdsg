@@ -9,6 +9,7 @@ pub trait GenericUInt:
     + Mul<Output = Self>
     + Rem<Output = Self>
     + Copy
+    + Div<Output = Self>
     + BitAnd<Output = Self>
     + PartialOrd
     + PartialEq
@@ -24,6 +25,7 @@ impl<T> GenericUInt for T where
         + Mul<Output = Self>
         + Rem<Output = Self>
         + Copy
+        + Div<Output = Self>
         + BitAnd<Output = Self>
         + PartialOrd
         + PartialEq
@@ -89,10 +91,69 @@ pub fn pow_mod<T: GenericUInt>(a: T, e: T, m: T) -> T {
     result
 }
 
-// this is slow, FLT
-fn mod_inv<T: GenericUInt>(a: T, m: T) -> T {
-    pow_mod(a, m - T::from(2), m)
+// this is so bad it's funny, case bashes a signed integer type
+#[derive(Clone, Copy)]
+struct GenSignedUint<T> {
+    value: T,
+    isneg: bool
 }
+
+
+fn mul_inv<T: GenericUInt>(a:T, b:T) -> T
+{
+    let (mut a, mut b) = (a,b);
+    if b <= T::from(1){
+        return T::from(0);
+    }
+    let one = T::from(1);
+    let zero = T::from(0);
+    let b0 = b;
+    let mut x0 = GenSignedUint{ value:zero, isneg:false }; // b = 1*b + 0*a
+    let mut x1 = GenSignedUint{ value:one, isneg:false }; // a = 0*b + 1*a
+
+    while a > one
+    {
+        if b == zero // means original A and B were not co-prime so there is no answer
+        {return zero;}
+        let q = a / b;
+        let t = b; b = a % b; a = t;
+
+        let t2 = x0;
+        let qx0 = q * x0.value;
+        if x0.isneg != x1.isneg
+        {
+            x0.value = x1.value + qx0;
+            x0.isneg = x1.isneg;
+        }
+        else
+        {
+            x0.value = if x1.value > qx0 {
+                    x1.value - qx0
+                } else {
+                    qx0 - x1.value
+                };
+
+            x0.isneg = if x1.value > qx0 {
+                    x1.isneg
+                } else {
+                    !x0.isneg
+                };
+        }
+        x1 = t2;
+    }
+    if x1.isneg {
+        return b0 - x1.value;
+    }
+    else {
+        return x1.value;
+    }
+}
+
+
+// this is slow, FLT
+//fn mod_inv<T: GenericUInt>(a: T, m: T) -> T {
+//    pow_mod(a, m - T::from(2), m)
+//}
 
 // An element of the unique finite field of order p where p is prime
 // No checks are done for primality of p as this is expensive, however if p were to be a composite
@@ -188,7 +249,7 @@ impl<T: GenericUInt + Debug> Div for &FpElem<T> {
     type Output = FpElem<T>;
     fn div(self, rhs: Self) -> FpElem<T> {
         FpElem {
-            number: mul_mod(self.number, mod_inv(rhs.number, rhs.prime), rhs.prime),
+            number: mul_mod(self.number, mul_inv(rhs.number, rhs.prime), rhs.prime),
             prime: self.prime,
         }
     }
