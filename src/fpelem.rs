@@ -55,7 +55,7 @@ fn add_mod<T: GenericUInt>(a: T, b: T, m: T) -> T {
     }
 }
 
-// Treat multiplication as composition of addiiton and spam binary expansion
+// Treat multiplication as composition of addition and spam binary expansion
 // See UofCambridge Quantum Information and Computation sheet 3 lol
 fn mul_mod<T: GenericUInt>(a: T, b: T, m: T) -> T {
     let mut b = b;
@@ -95,60 +95,59 @@ pub fn pow_mod<T: GenericUInt>(a: T, e: T, m: T) -> T {
 #[derive(Clone, Copy)]
 struct GenSignedUint<T> {
     value: T,
-    isneg: bool
+    isneg: bool,
 }
 
-
-fn mul_inv<T: GenericUInt>(a:T, b:T) -> T
-{
-    let (mut a, mut b) = (a,b);
-    if b <= T::from(1){
+fn mul_inv<T: GenericUInt>(a: T, b: T) -> T {
+    let (mut a, mut b) = (a, b);
+    if b <= T::from(1) {
         return T::from(0);
     }
     let one = T::from(1);
     let zero = T::from(0);
     let b0 = b;
-    let mut x0 = GenSignedUint{ value:zero, isneg:false }; // b = 1*b + 0*a
-    let mut x1 = GenSignedUint{ value:one, isneg:false }; // a = 0*b + 1*a
+    let mut x0 = GenSignedUint {
+        value: zero,
+        isneg: false,
+    }; // b = 1*b + 0*a
+    let mut x1 = GenSignedUint {
+        value: one,
+        isneg: false,
+    }; // a = 0*b + 1*a
 
-    while a > one
-    {
-        if b == zero // means original A and B were not co-prime so there is no answer
-        {return zero;}
+    while a > one {
+        if b == zero
+        // means original A and B were not co-prime so there is no answer
+        {
+            return zero;
+        }
         let q = a / b;
-        let t = b; b = a % b; a = t;
+        let t = b;
+        b = a % b;
+        a = t;
 
         let t2 = x0;
         let qx0 = q * x0.value;
-        if x0.isneg != x1.isneg
-        {
+        if x0.isneg != x1.isneg {
             x0.value = x1.value + qx0;
             x0.isneg = x1.isneg;
-        }
-        else
-        {
+        } else {
             x0.value = if x1.value > qx0 {
-                    x1.value - qx0
-                } else {
-                    qx0 - x1.value
-                };
+                x1.value - qx0
+            } else {
+                qx0 - x1.value
+            };
 
-            x0.isneg = if x1.value > qx0 {
-                    x1.isneg
-                } else {
-                    !x0.isneg
-                };
+            x0.isneg = if x1.value > qx0 { x1.isneg } else { !x0.isneg };
         }
         x1 = t2;
     }
     if x1.isneg {
         return b0 - x1.value;
-    }
-    else {
+    } else {
         return x1.value;
     }
 }
-
 
 // this is slow, FLT
 //fn mod_inv<T: GenericUInt>(a: T, m: T) -> T {
@@ -230,14 +229,12 @@ impl<T: GenericUInt> Mul<T> for &FpElem<T> {
 }
 
 pub trait Pow<T> {
-    fn pow_mod(&self, exponent: T) -> Self;
+    fn pow(&self, exponent: T) -> Self;
 }
 
-impl<T> Pow<T> for FpElem<T>
-where
-    T: GenericUInt,
+impl<T: GenericUInt> Pow<T> for FpElem<T>
 {
-    fn pow_mod(&self, exponent: T) -> Self {
+    fn pow(&self, exponent: T) -> Self {
         FpElem {
             number: pow_mod(self.number, exponent, self.prime),
             prime: self.prime,

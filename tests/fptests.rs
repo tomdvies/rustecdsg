@@ -1,6 +1,9 @@
 use rustecdsg::FpElem;
+use std::fmt::Debug;
+use rustecdsg::Pow;
+use rustecdsg::GenericUInt;
 extern crate primitive_types;
-use primitive_types::U512;
+use primitive_types::{U256, U512};
 
 #[test]
 fn fpelem_new() {
@@ -74,8 +77,36 @@ fn fpelem_div() {
     let p = "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f";
     let to_invert = [10, 99991, 2, 1208128, 1299392];
     for r in to_invert.iter() {
-        let to_inv = FpElem::<U512>::new_from(*r, p);
-        let one = FpElem::<U512>::new_from(1, p);
+        let to_inv = FpElem::<U256>::new_from(*r, p);
+        let one = FpElem::<U256>::new_from(1, p);
         assert_eq!(&to_inv / &to_inv, one);
     }
 }
+
+// slow loop through and mul
+fn slow_pow<T: GenericUInt + Debug>(exp: FpElem<T>, base: T) -> FpElem<T>{
+    let one = T::from(1);
+    let mut out = FpElem::new(one, exp.prime);
+    let zero = T::from(0);
+    let mut counter = base;
+    loop{
+        if counter == zero {
+            return out;
+        }
+        out = &out * &exp;
+        counter = counter - one;
+    }
+}
+
+#[test]
+fn fpelem_pow(){
+    // compares bashing mul with pow_mod
+    let triplets = [(100,3,1033), (100,30,3673), (300,400,200)];
+    for (base, exp, prime) in triplets.iter(){
+        let base = FpElem::new(*base, *prime);
+        let rhs = slow_pow(base, *exp);
+        assert_eq!(base.pow(*exp), rhs);
+    }
+}
+
+
