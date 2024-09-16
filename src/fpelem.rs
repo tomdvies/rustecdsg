@@ -242,7 +242,7 @@ impl<T: GenericUInt> Pow<T> for FpElem<T>
     }
 }
 
-impl<T: GenericUInt + Debug> Div for &FpElem<T> {
+impl<T: GenericUInt> Div for &FpElem<T> {
     type Output = FpElem<T>;
     fn div(self, rhs: Self) -> FpElem<T> {
         FpElem {
@@ -251,3 +251,5 @@ impl<T: GenericUInt + Debug> Div for &FpElem<T> {
         }
     }
 }
+
+
