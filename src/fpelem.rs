@@ -1,5 +1,5 @@
 use std::fmt::Debug;
-use std::ops::{Add, BitAnd, Div, Mul, Rem, Shr, Sub};
+use std::ops::{Add, BitAnd, Div, Mul, Rem, Shl, Shr, Sub};
 //extern crate primitive_types;
 //use primitive_types::U512;
 
@@ -14,7 +14,7 @@ pub trait GenericUInt:
     + PartialOrd
     + PartialEq
     + Shr<Output = Self>
-    + Default
+    + Shl<Output = Self>
     + From<u8>
 {
 }
@@ -30,7 +30,7 @@ impl<T> GenericUInt for T where
         + PartialOrd
         + PartialEq
         + Shr<Output = Self>
-        + Default
+        + Shl<Output = Self>
         + From<u8>
 {
 }
@@ -232,8 +232,7 @@ pub trait Pow<T> {
     fn pow(&self, exponent: T) -> Self;
 }
 
-impl<T: GenericUInt> Pow<T> for FpElem<T>
-{
+impl<T: GenericUInt> Pow<T> for FpElem<T> {
     fn pow(&self, exponent: T) -> Self {
         FpElem {
             number: pow_mod(self.number, exponent, self.prime),
@@ -251,5 +250,3 @@ impl<T: GenericUInt> Div for &FpElem<T> {
         }
     }
 }
-
-
