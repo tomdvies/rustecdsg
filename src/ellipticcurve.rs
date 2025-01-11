@@ -118,3 +118,26 @@ impl<T: GenericUInt> Mul<FpElem<T>> for &ECPoint<FpElem<T>> {
         *self * tomul
     }
 }
+
+impl<T: GenericUInt> ECPoint<FpElem<T>> {
+    pub fn new(x: impl Into<T>, y: impl Into<T>, a: impl Into<T>, b: impl Into<T>, prime: impl Into<T>) -> Self {
+        let prime = prime.into();
+        ECPoint {
+            position: Some((
+                FpElem::new_from(x, prime),
+                FpElem::new_from(y, prime)
+            )),
+            a: FpElem::new_from(a, prime),
+            b: FpElem::new_from(b, prime)
+        }
+    }
+
+    pub fn new_infinity(a: impl Into<T>, b: impl Into<T>, prime: impl Into<T>) -> Self {
+        let prime = prime.into();
+        ECPoint {
+            position: None,
+            a: FpElem::new_from(a, prime),
+            b: FpElem::new_from(b, prime)
+        }
+    }
+}

@@ -1,4 +1,4 @@
-use std::fmt::Debug;
+use std::fmt::{Debug, Display, Formatter};
 use std::ops::{Add, BitAnd, Div, Mul, Rem, Shl, Shr, Sub};
 //extern crate primitive_types;
 //use primitive_types::U512;
@@ -248,5 +248,11 @@ impl<T: GenericUInt> Div for &FpElem<T> {
             number: mul_mod(self.number, mul_inv(rhs.number, rhs.prime), rhs.prime),
             prime: self.prime,
         }
+    }
+}
+
+impl<T: GenericUInt + Display> Display for FpElem<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.number)
     }
 }
