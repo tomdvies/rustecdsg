@@ -5,6 +5,7 @@ edition = "2021"
 
 [dev-dependencies]
 primitive-types = "0.12.2"
+plotters = "0.3.7"
 
 [dependencies]
 rand = "0.8.5"

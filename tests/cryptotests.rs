@@ -40,7 +40,6 @@ fn signature_verify() {
     assert!(is_valid);
 }
 
-
 #[test]
 fn sign_hash() {
     // secp256k1 parameters
@@ -51,23 +50,26 @@ fn sign_hash() {
 
     // Create generator point
     let g: ECPoint<FpElem<U512>> = ECPoint::new(gx, gy, U512::from(0), U512::from(7), p);
-    
+
     // Create private key and KeyChain
     let priv_key = FpElem::new(U512::from(123456789), n); // Example private key
     let keychain = KeyChain::new_priv(priv_key, (g, n));
-    
+
     // Message hash to sign
-    let z = FpElem::new(U512::from("0xbc62d4b80d9e36da29c16c5d4d9f11731f36052c72401a76c23c0fb5a9b74423"), n);
-    
+    let z = FpElem::new(
+        U512::from("0xbc62d4b80d9e36da29c16c5d4d9f11731f36052c72401a76c23c0fb5a9b74423"),
+        n,
+    );
+
     // Sign the hash
     let sig = keychain.sign(&z).unwrap();
-    
+
     // Verify the signature with the public key
     let is_valid = keychain.verify_sig(&z, &sig);
     println!("Generated signature verification result: {}", is_valid);
     println!("Signature r: {}", sig.targetx);
     println!("Signature s: {}", sig.sig);
     println!("Hash: {}", z);
-    
+
     assert!(is_valid);
 }

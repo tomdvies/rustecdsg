@@ -1,15 +1,14 @@
-use crate::fpelem::{FpElem, Pow, GenericUInt};
-use std::ops::{Mul, Add};
-use std::fmt::Debug;
+use crate::fpelem::{FpElem, GenericUInt, Pow};
 use std::fmt;
-
+use std::fmt::Debug;
+use std::ops::{Add, Mul};
 
 #[derive(PartialEq, Clone, Copy)]
-pub struct ECPoint<T>{
+pub struct ECPoint<T> {
     // None = Infinity here
-    pub position: Option<(T,T)>,
+    pub position: Option<(T, T)>,
     a: T,
-    b:T
+    b: T,
 }
 
 // Formatting is very ugly else
@@ -120,15 +119,18 @@ impl<T: GenericUInt> Mul<FpElem<T>> for &ECPoint<FpElem<T>> {
 }
 
 impl<T: GenericUInt> ECPoint<FpElem<T>> {
-    pub fn new(x: impl Into<T>, y: impl Into<T>, a: impl Into<T>, b: impl Into<T>, prime: impl Into<T>) -> Self {
+    pub fn new(
+        x: impl Into<T>,
+        y: impl Into<T>,
+        a: impl Into<T>,
+        b: impl Into<T>,
+        prime: impl Into<T>,
+    ) -> Self {
         let prime = prime.into();
         ECPoint {
-            position: Some((
-                FpElem::new_from(x, prime),
-                FpElem::new_from(y, prime)
-            )),
+            position: Some((FpElem::new_from(x, prime), FpElem::new_from(y, prime))),
             a: FpElem::new_from(a, prime),
-            b: FpElem::new_from(b, prime)
+            b: FpElem::new_from(b, prime),
         }
     }
 
@@ -137,7 +139,7 @@ impl<T: GenericUInt> ECPoint<FpElem<T>> {
         ECPoint {
             position: None,
             a: FpElem::new_from(a, prime),
-            b: FpElem::new_from(b, prime)
+            b: FpElem::new_from(b, prime),
         }
     }
 }

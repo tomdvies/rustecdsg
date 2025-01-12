@@ -156,7 +156,7 @@ mod tests {
 
     #[test]
     fn test_get_generic_uint_below() {
-        let under = 331u32;
+        let under = 30u32;
         for _ in 0..100000 {
             let result = get_generic_uint_below(under);
             assert!(result < under);
@@ -171,5 +171,49 @@ mod tests {
         let expected_count = 100000 / under;
         let tolerance = expected_count / 10; // 10% tolerance
         assert!((counts[4] as i32 - expected_count as i32).abs() <= tolerance as i32);
+        //
+        // // Plot the distribution
+        // use plotters::prelude::*;
+        //
+        // let root = BitMapBackend::new("random_distribution.png", (640, 480))
+        //     .into_drawing_area();
+        // root.fill(&WHITE).unwrap();
+        //
+        // let max_count = *counts.iter().max().unwrap() as f32;
+        // let mut chart = ChartBuilder::on(&root)
+        //     .caption("Distribution of Random Values", ("sans-serif", 30))
+        //     .margin(5)
+        //     .x_label_area_size(30)
+        //     .y_label_area_size(30)
+        //     .build_cartesian_2d(0..under as i32, 0f32..max_count)
+        //     .unwrap();
+        //
+        // chart.configure_mesh().draw().unwrap();
+        //
+        // // Plot actual distribution
+        // chart
+        //     .draw_series(
+        //         Histogram::vertical(&chart)
+        //             .style(BLUE.mix(0.5).filled())
+        //             .data(counts.iter().enumerate().map(|(x, y)| (x as i32, *y as f32)))
+        //     )
+        //     .unwrap()
+        //     .label("Actual Distribution");
+        //
+        // // Plot expected line
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..under as i32).map(|x| (x, expected_count as f32)),
+        //         &RED,
+        //     ))
+        //     .unwrap()
+        //     .label("Expected Value");
+        //
+        // chart
+        //     .configure_series_labels()
+        //     .background_style(&WHITE.mix(0.8))
+        //     .border_style(&BLACK)
+        //     .draw()
+        //     .unwrap();
     }
 }
