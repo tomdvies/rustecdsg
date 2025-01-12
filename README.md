@@ -4,7 +4,7 @@ A from-scratch implementation of Elliptic Curve Digital Signature Algorithm (ECD
 ## Features
 
 - Pure Rust implementation of ECDSA
-- Generic implementation supporting various integer sizes
+- Generic implementation supporting various integer sizes - see the `GenericUInt` trait
 - Finite field arithmetic operations
 - Elliptic curve point operations
 - Key generation and management
