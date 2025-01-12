@@ -77,7 +77,7 @@ fn main() {
     assert!(is_valid);
 
     // If you only have the public key, you can create a KeyChain for verification:
-    let public_key = keychain.get_public_key();
+    let public_key = keychain.pub_key;
     let verifier = KeyChain::new_pub(public_key, (g, n));
     
     // Verify using only public information
